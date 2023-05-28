@@ -1,0 +1,119 @@
+
+import java.awt.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class PatientDAOImpl implements PatientDAO {
+    private Connection con;
+
+    public PatientDAOImpl(Connection con) {
+        this.con = con;
+    }
+
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
+    @Override
+    public List<Patient> getAllPatients() throws SQLException {
+        List<Patient> patients = new ArrayList<>();
+        String sql = "SELECT * FROM Patientregistration";
+        try (PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                Patient patient = new Patient();
+                patient.setPatientID(rs.getString("PatientID"));
+                patient.setPatientName(rs.getString("PatientName"));
+                patient.setFatherName(rs.getString("FatherName"));
+                patient.setAddress(rs.getString("Address"));
+                patient.setContactNo(rs.getString("ContactNo"));
+                patient.setEmail(rs.getString("Email"));
+                patient.setAge(rs.getInt("Age"));
+                patient.setGender(rs.getString("Gen"));
+                patient.setBloodGroup(rs.getString("BG"));
+                patient.setRemarks(rs.getString("Remarks"));
+
+                patients.add(patient);
+            }
+        }
+        return patients;
+    }
+
+    public Patient getPatientByID(String patientID) throws SQLException {
+        String sql = "SELECT * FROM PatientDetails WHERE PatientID = ?";
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, patientID);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    Patient patient = new Patient();
+                    patient.setPatientID(rs.getString("PatientID"));
+                    patient.setPatientName(rs.getString("Patientname"));
+                    patient.setFatherName(rs.getString("Fathername"));
+                    patient.setAddress(rs.getString("Address"));
+                    patient.setContactNo(rs.getString("ContactNo"));
+                    patient.setEmail(rs.getString("Email"));
+                    patient.setAge(rs.getInt("Age"));
+                    patient.setRemarks(rs.getString("Remarks"));
+                    patient.setBloodGroup(rs.getString("BG"));
+                    patient.setGender(rs.getString("Gen"));
+
+                    return patient;
+                }
+            }
+        }
+        return null;
+    }
+
+   
+public void addPatient(Patient patient) throws SQLException {
+    String sql = "INSERT INTO Patientregistration (PatientID, PatientName, FatherName, Address, ContactNo, Email, Age, Gen, BG, Remarks) " +
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setString(1, patient.getPatientID());
+        pst.setString(2, patient.getPatientName());
+        pst.setString(3, patient.getFatherName());
+        pst.setString(4, patient.getAddress());
+        pst.setString(5, patient.getContactNo());
+        pst.setString(6, patient.getEmail());
+        pst.setInt(7, patient.getAge());
+        pst.setString(8, patient.getGender());
+        pst.setString(9, patient.getBloodGroup());
+        pst.setString(10, patient.getRemarks());
+        
+        pst.executeUpdate();
+    }
+}
+
+
+public void updatePatient(Patient patient) throws SQLException {
+    String sql = "UPDATE Patientregistration SET PatientName = ?, FatherName = ?, Address = ?, ContactNo = ?, " +
+                 "Email = ?, Age = ?, Gen = ?, BG = ?, Remarks = ? WHERE PatientID = ?";
+    try (PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setString(1, patient.getPatientName());
+        pst.setString(2, patient.getFatherName());
+        pst.setString(3, patient.getAddress());
+        pst.setString(4, patient.getContactNo());
+        pst.setString(5, patient.getEmail());
+        pst.setInt(6, patient.getAge());
+        pst.setString(7, patient.getGender());
+        pst.setString(8, patient.getBloodGroup());
+        pst.setString(9, patient.getRemarks());
+        pst.setString(10, patient.getPatientID());
+        
+        pst.executeUpdate();
+    }
+
+
+}
+public void deletePatient(String patientID) throws SQLException {
+    String sql = "DELETE FROM Patientregistration WHERE PatientID = ?";
+    try (PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setString(1, patientID);
+        pst.executeUpdate();
+    }
+}
+}
